@@ -42,7 +42,6 @@ class RequestHandler(SimpleHTTPRequestHandler):
 				args = d['args'][0]
 				curdir = d['dir'][0]
 				args = json.loads(args)
-				port = args['port']
 				self.jc = d['callback'][0]
 				
 				os.chdir(curdir)
@@ -63,12 +62,14 @@ class RequestHandler(SimpleHTTPRequestHandler):
 						self.writeback({'pid':proc.pid})	
 						
 				elif action == 'rpycexec':
+					port = args['port']
 					cmd = args['cmd']
 					c = classic.connect('localhost',port)
 					c.root.mainexecute(cmd)
 					self.writeback('ok')
 					
 				elif action == 'rpyceval':
+					port = args['port']
 					cmd = args['cmd']
 					c = classic.connect('localhost',port)
 					result = classic.obtain(c.root.maineval(cmd))
@@ -76,7 +77,8 @@ class RequestHandler(SimpleHTTPRequestHandler):
 					self.writeback({'result':result})
 			
 				elif action == 'python':
-					cmd = 'python rpyc_run.py %s' % (args['script'],)
+					port = args['port']
+					cmd = 'python rpyc_run.py %s %s' % (args['script'], port)
 					proc = Popen(cmd, close_fds=True, shell=True,
 						stdin=PIPE, stdout=None, stderr=None)
 						

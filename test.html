@@ -1,6 +1,7 @@
-<html>
 <head>
-<title>demo</title>
+<title>PyReg Demo</title>
+</head>
+
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.1.min.js"></script>
 <script type="text/javascript" src="http://jquery-jsonp.googlecode.com/files/jquery.jsonp-1.0.4.min.js"></script>
 <script type="text/javascript" src="jquery.query.js"></script>
@@ -51,8 +52,7 @@
 </script>
 <style type="text/css">
 </style>
-</head>
-<body>
+
 	
 <h1>PyReg Demo</h1>
 <p>This is a documentation file that also acts as an interactive display to some python code. This works by giving javascript access to a python environment.
@@ -75,7 +75,7 @@ You need to have the supervisor server running, it sort of bootstraps the system
 	<input type="button" value="Clear" onClick="$('#ls').html('output')"><br><br>
 	
 <script>
-python = Python(9001)
+python = Python(9000)
 
 function evalpy() {
 	python.evalpython($('#evaltxt').val(), function (data) {
@@ -103,14 +103,32 @@ You can use the supervisor server to run a python script, in a separate process,
 <p>test.py:
 <div><pre id="testpy"></pre></div>
 <input type="button" value="rpyc_run test.py" onClick="launchtestpy()">
-<div>Evaluate (try A['a'], A.keys(), etc): <br><input id="evaltxt" value="A"><br> <input type="button" value="Ok" onClick="evalpy()">
+<div>Evaluate (try A['a'], A.keys(), etc): <br><input id="evaltxt" value="A"> <input type="button" value="Evaluate" onClick="evalpy()"><br>
 	Results:<br>
 	<pre id="evaloutput"></pre></div>
 	
 	
+<script>
+python2 = Python(9001)
+
+function evalpy2() {
+	python2.evalpython($('#evaltxt2').val(), function (data) {
+		//$('#evaloutput').html('a:' + data.result.a + ' b: ' + data.result.b)
+		$('#evaloutput2').html(JSON.stringify(data.result))
+	})
+}
+
+function launchtestpy2() {
+	python2.spawnpython("test.py", function (data) {
+		refresh()
+	})
+}
+</script>
+
+	
 <h2>3. Interaction with a terminal process</h2>
 If you use rpyc_run from a command line, you can still hook up to it from the browser. Go ahead and put this in your shell:
-<div><pre>python -m rpyc_run test.py 
-	
-</body>
-</html>
+<div><pre>python -m rpyc_run test.py</pre></div>
+<div>Evaluate (try A['a'], A.keys(), etc): <br><input id="evaltxt2" value="A"> <input type="button" value="Evaluate" onClick="evalpy2()"><br>
+	Results:<br>
+	<pre id="evaloutput2"></pre></div>

@@ -14,12 +14,13 @@ Make sure your PYTHONPATH includes this pyreg directory.
 Usage
 -----
 
-1. Run the supervisor server
-	$ python proc_server.py
+1. Run the supervisor server. The -i is needed to keep it open.
+	$ python -i proc_server.py
 
-2. In another tab, run the test script with an rpyc_server
+
+2. In another tab, run the test script with an rpyc_server. You'll get an ipython shell after test.py completes.
 	$ python -m rpyc_run test.py
 
 
-3. Open test.html in a browser. Documentation takes over from there
+3. Open test.html in a browser. Documentation takes over from there.
 

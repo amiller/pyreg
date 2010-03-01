@@ -30,7 +30,7 @@ class MySlave(classic.SlaveService):
 queue = Queue()
 
 def shell():
-	IPShellEmbed()()
+	IPShellEmbed(user_ns=globals())()
 	import os
 	os._exit(0)
 	
@@ -65,7 +65,7 @@ if __name__ == '__main__':
 	
 	port = 9001	
 	if len(sys.argv) >= 3:
-		port = sys.argv[2]
+		port = int(sys.argv[2])
 
 	start(port)
 		

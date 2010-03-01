@@ -1,0 +1,116 @@
+<html>
+<head>
+<title>demo</title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.4.1.min.js"></script>
+<script type="text/javascript" src="http://jquery-jsonp.googlecode.com/files/jquery.jsonp-1.0.4.min.js"></script>
+<script type="text/javascript" src="jquery.query.js"></script>
+<script type="text/javascript" src="http://webscan.googlecode.com/svn-history/r80/trunk/ui/js/third-party/json2.min.js"></script>
+<script type="text/javascript" src="common.js"></script>
+<script>
+	function refresh() {
+		list(function (data) {
+			$('#procs').html('')
+			$.each(data, function (k,x) {
+				$('#procs').append('<div>[' + x.cmd + '] '+x.pid+ 
+				'<input type="button" value="kill" onClick="kill(' + x.pid + ')"></div>')
+			})
+		})
+	}
+
+	// Bind event handlers to the right objects, when the document is loaded
+	function launchpython() {
+		spawn('ipython', function (data) {
+			refresh()
+		})
+	}
+
+	
+	function launchsleep() {
+		spawn('sleep 5', function (data) {
+			refresh()
+		})
+	}
+	
+	function launchls() {
+		spawnwait("ls", function (data) {
+			$('#ls').html(data.stdout)
+			refresh()
+		})
+	}
+	
+	function kill(pid) {
+		killproc(pid, function (data) {
+			refresh()
+		})
+	}
+	
+	$(function() {
+		refresh()
+	});
+	
+</script>
+<style type="text/css">
+</style>
+</head>
+<body>
+	
+<h1>PyReg Demo</h1>
+<p>This is a documentation file that also acts as an interactive display to some python code. This works by giving javascript access to a python environment.
+
+<p>There are three ways for the browser to get some python access.
+<h2>1. Interaction with the supervisor server</h2>
+You need to have the supervisor server running, it sort of bootstraps the system. You can use it to run shell commands and spawn processes. It basically exposes the whole system to javascript. It might be nice to build a browser-based terminal, but terminals are tricky to get right. But the main benefit is to use javascript to visualize directory structures and data files.
+<br><br>
+<div id="procs">
+	
+</div>
+<div>
+	<input type="button" value="Refresh" onClick="refresh()">
+	<input type="button" value="Python" onClick="launchpython()">
+	<input type="button" value="Sleep 10" onClick="launchsleep()">
+	<input type="button" value="ls" onClick="launchls()">
+</div>
+<div>ls output: <br>
+	<pre id="ls">output</pre></div>
+	<input type="button" value="Clear" onClick="$('#ls').html('output')"><br><br>
+	
+<script>
+python = Python(9001)
+
+function evalpy() {
+	python.evalpython($('#evaltxt').val(), function (data) {
+		//$('#evaloutput').html('a:' + data.result.a + ' b: ' + data.result.b)
+		$('#evaloutput').html(JSON.stringify(data.result))
+	})
+}
+
+function launchtestpy() {
+	python.spawnpython("test.py", function (data) {
+		refresh()
+	})
+}
+
+$(function() {
+	spawnwait("cat test.py", function (data) {
+		$('#testpy').html(data.stdout)
+	})
+})
+	
+</script>
+
+<h2>2. Interaction with a remote process</h2>
+You can use the supervisor server to run a python script, in a separate process, with a thread for handling rpyc connections.
+<p>test.py:
+<div><pre id="testpy"></pre></div>
+<input type="button" value="rpyc_run test.py" onClick="launchtestpy()">
+<div>Evaluate (try A['a'], A.keys(), etc): <br><input id="evaltxt" value="A"><br> <input type="button" value="Ok" onClick="evalpy()">
+	Results:<br>
+	<pre id="evaloutput"></pre></div>
+	
+	
+<h2>3. Interaction with a terminal process</h2>
+If you use rpyc_run from a command line, you can still hook up to it from the browser. Go ahead and put this in your shell:
+<div><pre>python -m rpyc_run test.py 
+	
+</body>
+</html>

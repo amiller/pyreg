@@ -78,7 +78,7 @@ class RequestHandler(SimpleHTTPRequestHandler):
 			
 				elif action == 'python':
 					port = args['port']
-					cmd = 'python rpyc_run.py %s %s' % (args['script'], port)
+					#cmd = 'python -m rpyc_run %s %s' % (args['script'], port)
 					proc = Popen(cmd, close_fds=True, shell=True,
 						stdin=PIPE, stdout=None, stderr=None)
 						

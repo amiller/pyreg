@@ -1,71 +1,101 @@
 
+// This code was written by Tyler Akins and has been placed in the
+// public domain.  It would be nice if you left this header intact.
 // Base64 code from Tyler Akins -- http://rumkin.com
+
 var keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=";
 
 var curpath = document.location.pathname;
 var curdir = curpath.substr(0, curpath.lastIndexOf('/')+1);
 
 function Python(port) {
-	
-	if (typeof(port) == 'undefined')
-		port = 21000
-	
-	function callproc(args, success, error) {
-		if (typeof(error) == 'undefined')
-			error = function (data) { alert('Error making json call') }
-		/*$.jsonp({
-			url: 'http://localhost:' + port + '/?',
-			data: {args:args, dir:curdir},
-		  dataType: 'jsonp',
-			callbackParameter: 'callback',
-			success: success,
-			error: error,
-		})	*/
-		$.ajax({
-			url: 'http://localhost:' + port + '/?callback=?&',
-			data: {args:args, dir:curdir},
-		  dataType: 'jsonp',
-			success: success,
-			error: error,
-		})
-	}
-	
 	return {
-		eval: function eval(cmd, success) {
+		evalpython: function evalpython(cmd, success) {
 			args = JSON.stringify({
-				action:'eval',
+				action:'rpyceval',
 				cmd:cmd,
+				port:port,
 			})
 			callproc(args, success)
 		},
 
-		exec: function exec(cmd, success) {
+		execpython: function execpython(cmd, success) {
 			args = JSON.stringify({
-				action:'exec',
+				action:'rpycexec',
 				cmd:cmd,
+				port:port,
 			})
 			callproc(args, success)
 		},
 
-		longpoll: function longpoll(timeout) {
+		spawnpython: function spawnpython(script, success) {
+			args = JSON.stringify({
+				action:'python',
+				script:script,
+				port:port
+			})
+			callproc(args, success)
+		}
+		
+		longpoll: function longpoll() {
 			function success(data) {
-				eval(data)
-				setTimeout(longpoll, 50);
-			}
-			function error(xoptions, err) {
-				if (err == 'timeout')
-					setTimeout(longpoll, 500)
-				else
-					setTimeout(longpoll, 1000)
+				setTimeout('longpoll()', 10);
 			}
 			args = JSON.stringify({
 				action:'longpoll',
+				port:port
 			})
-			callproc(args, success, error, timeout)
 		}
 	}
 }
 
+function callproc(args, success, error) {
+	if (typeof(error) == 'undefined')
+		error = function (data) { alert('Error making json call') }
+		
+	$.jsonp({
+		url: 'http://localhost:21000/procs/?',
+		data: {args:args, dir:curdir},
+	  dataType: 'jsonp',
+		callbackParameter: 'callback',
+		success: success,
+		error: error,
+	})	
+}
+
+
+function spawnwait(cmd, success) {
+	args = JSON.stringify({
+		action:'spawn',
+		cmd:cmd,
+		wait:true
+	})
+	callproc(args, success)
+}
+
+function list(success) {
+	args = JSON.stringify({
+		action:'list'
+	})
+	callproc(args, success)
+}
+
+
+function spawn(cmd, success) {
+	args = JSON.stringify({
+		action:'spawn',
+		cmd:cmd,
+	})
+	callproc(args, success)
+}
+
+function killproc(pid, success) {
+	args = JSON.stringify({
+		action:'kill',
+		pid:pid
+	})
+	callproc(args, success)
+}
 
 function encode64(input) {
    var output = "";

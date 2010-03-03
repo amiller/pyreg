@@ -51,7 +51,6 @@ def start(port):
 		d['result'] = d['f'](d['text'], globals())
 		if d.has_key('event'):
 			d['event'].set()
-		print 'its done'
 	
 	t.join()
 	t2.join()

@@ -1,134 +1,84 @@
 <head>
 <title>PyReg Demo</title>
+
+<script type="text/javascript" src="web-socket-js/swfobject.js"></script>
+<script type="text/javascript" src="web-socket-js/FABridge.js"></script>
+<script type="text/javascript" src="web-socket-js/web_socket.js"></script>
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="jquery.query.js"></script>
+<script type="text/javascript" src="json2.min.js"></script>
+<script type="text/javascript" src="pyreg.js"></script>
+
+<script>
+WebSocket.__swfLocation = "web-socket-js/WebSocketMain.swf"
+// Create a python bridge
+python = Python(21000)	
+</script>
+
 </head>
 
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.4.1.min.js"></script>
-<script type="text/javascript" src="http://jquery-jsonp.googlecode.com/files/jquery.jsonp-1.0.4.min.js"></script>
-<script type="text/javascript" src="jquery.query.js"></script>
-<script type="text/javascript" src="http://webscan.googlecode.com/svn-history/r80/trunk/ui/js/third-party/json2.min.js"></script>
-<script type="text/javascript" src="common.js"></script>
-<script>
-	function refresh() {
-		list(function (data) {
-			$('#procs').html('')
-			$.each(data, function (k,x) {
-				$('#procs').append('<div>[' + x.cmd + '] '+x.pid+ 
-				'<input type="button" value="kill" onClick="kill(' + x.pid + ')"></div>')
-			})
-		})
-	}
-
-	// Bind event handlers to the right objects, when the document is loaded
-	function launchpython() {
-		spawn('ipython', function (data) {
-			refresh()
-		})
-	}
-
-	
-	function launchsleep() {
-		spawn('sleep 5', function (data) {
-			refresh()
-		})
-	}
-	
-	function launchls() {
-		spawnwait("ls", function (data) {
-			$('#ls').html(data.stdout)
-			refresh()
-		})
-	}
-	
-	function kill(pid) {
-		killproc(pid, function (data) {
-			refresh()
-		})
-	}
-	
-	$(function() {
-		refresh()
-	});
-	
-</script>
 <style type="text/css">
 </style>
 
 	
 <h1>PyReg Demo</h1>
-<p>This is a documentation file that also acts as an interactive display to some python code. This works by giving javascript access to a python environment.
+<p>This project makes a simple bridge between your python and your javascript. You can use the browser as an interface and debug display for your code!
+	
+<p>Make sure this folder (pyreg) is in your path. Get things started by running:
+<code>python -m ajax_run test.py</code>. This opens up a server, executes 'test.py', and drops you into an IPython shell.
 
-<p>There are three ways for the browser to get some python access.
-<h2>1. Interaction with the supervisor server</h2>
-You need to have the supervisor server running, it sort of bootstraps the system. You can use it to run shell commands and spawn processes. It basically exposes the whole system to javascript. It might be nice to build a browser-based terminal, but terminals are tricky to get right. But the main benefit is to use javascript to visualize directory structures and data files.
-<br><br>
-<div id="procs">
-	
-</div>
-<div>
-	<input type="button" value="Refresh" onClick="refresh()">
-	<input type="button" value="Python" onClick="launchpython()">
-	<input type="button" value="Sleep 10" onClick="launchsleep()">
-	<input type="button" value="ls" onClick="launchls()">
-</div>
-<div>ls output: <br>
-	<pre id="ls">output</pre></div>
-	<input type="button" value="Clear" onClick="$('#ls').html('output')"><br><br>
-	
 <script>
-python = Python(9000)
+</script>
+<p>Ready: <span>[loading indicator]</span>
 
+<h2>1. Javascript to Python</h2>
+
+<script>
 function evalpy() {
-	python.evalpython($('#evaltxt').val(), function (data) {
-		//$('#evaloutput').html('a:' + data.result.a + ' b: ' + data.result.b)
-		$('#evaloutput').html(JSON.stringify(data.result))
+	python.eval($('#evaltxt').val(), function (data) {
+		$('#evaloutput').html(JSON.stringify(data))
 	})
 }
-
-function launchtestpy() {
-	python.spawnpython("test.py", function (data) {
-		refresh()
+function execpy() {
+	python.exec($('#exectxt').val(), function (data) {
 	})
-}
-
-$(function() {
-	spawnwait("cat test.py", function (data) {
-		$('#testpy').html(data.stdout)
-	})
-})
-	
+}	
 </script>
 
-<h2>2. Interaction with a remote process</h2>
-You can use the supervisor server to run a python script, in a separate process, with a thread for handling rpyc connections.
-<p>test.py:
-<div><pre id="testpy"></pre></div>
-<input type="button" value="rpyc_run test.py" onClick="launchtestpy()">
-<div>Evaluate (try A['a'], A.keys(), etc): <br><input id="evaltxt" value="A"> <input type="button" value="Evaluate" onClick="evalpy()"><br>
-	Results:<br>
-	<pre id="evaloutput"></pre></div>
+<p>Try evaluating python expressions and executing python statements. The statements are sent as strings, and the results are jsonified.
 	
+<br><input id="exectxt" value="A = {'a':'hello', 1:12}">
+<input type="button" value="Execute" onClick="execpy()">
+<br><input id="evaltxt" value="A['a']">
+<input type="button" value="Evaluate" onClick="evalpy()">
+Result: <code id="evaloutput"></code>
+
 	
+<h2>2. Python to Javascript</h2>
+Go to your terminal, but keep the browser visible. Run a few of the following:
+
+<div><code>pyreg.eval("alert('python says hi')")</code></div>
+<div><code>pyreg.eval("loadimage()")</code></div>
+
+<div><img width="250" id="image"/></div>
+
 <script>
-python2 = Python(9001)
-
-function evalpy2() {
-	python2.evalpython($('#evaltxt2').val(), function (data) {
-		//$('#evaloutput').html('a:' + data.result.a + ' b: ' + data.result.b)
-		$('#evaloutput2').html(JSON.stringify(data.result))
+$(function() {
+	/*
+	python.eval('1', function(data) {
+			alert(data)
 	})
-}
-
-function launchtestpy2() {
-	python2.spawnpython("test.py", function (data) {
-		refresh()
-	})
-}
+	python.eval('1', function(data) {
+			alert(data)
+	})*/
+	//python.longpoll(1000)
+})
 </script>
 
-	
-<h2>3. Interaction with a terminal process</h2>
-If you use rpyc_run from a command line, you can still hook up to it from the browser. Go ahead and put this in your shell:
-<div><pre>python -m rpyc_run test.py</pre></div>
-<div>Evaluate (try A['a'], A.keys(), etc): <br><input id="evaltxt2" value="A"> <input type="button" value="Evaluate" onClick="evalpy2()"><br>
-	Results:<br>
-	<pre id="evaloutput2"></pre></div>
+<h1>ToDo</h1>
+<pre>
+- SimpleHTTPServer is annoying because it prints every request and I can't figure out how to make it quiet. Switching to Tornado or Twisted may help.
+- Longpolling doesn't work right.
+</pre>
+

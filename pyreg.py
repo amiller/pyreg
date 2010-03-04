@@ -1,26 +1,110 @@
-from rpyc import classic
-import sys
-from IPython.Shell import Term, IPShellEmbed
-import IPython
-# Con
+import tornado.httpserver
+import tornado.ioloop
+import tornado.options
+import tornado.web
+import tornado.websocket
 
-c = None
-root = None
+import os
+import string
+import thread
+import simplejson as json
+import time
+from Queue import Queue
 
-def connect(port=9001):
-	# Connect to rpyc
-	global c
-	c = classic.connect('localhost',port)
-	c.modules.IPython = IPython
+
+def getpipe():
+	r, w = os.pipe()
+	return os.fdopen(r,'r',0), os.fdopen(w,'w',0)
 	
-	#c.modules.sys.stdout = sys.stdout
-	#c.modules.sys.stdin = sys.stdin
-	#c.modules.sys.stderr = sys.stderr
+class MainHandler(tornado.websocket.WebSocketHandler):
+	longin, longout = getpipe()
+	longqueue = Queue()
+	receivers = []
 	
-	#c.root.shell(Term.cin, Term.cerr, Term.cout)
-	global root
-	root = c.root
-	c.root.shell()
+	@classmethod
+	def _write_handle(cls):
+		print 'written'
 	
-	global A
-	A = 5
+	@classmethod
+	def _push_handler(cls, fd, events):
+		cls.longin.read(1)
+		cmd = cls.longqueue.get()
+		item = {'push':cmd}
+		# Put it on the cache, notify all the waiters
+		cls.receivers = [x for x in cls.receivers if not x.stream.closed()]
+		for receiver in cls.receivers:
+			receiver.writeback(item)
+
+	@classmethod
+	def setup(cls):
+		loop = tornado.ioloop.IOLoop.instance()
+		loop.add_handler(cls.longin.fileno(), cls._push_handler, loop.READ)
+		loop._set_nonblocking(cls.longin.fileno())
+	
+	def writeback(self, jsonobj):
+		if not self.stream.closed():
+			self.write_message(json.dumps(jsonobj))
+
+	def open(self):
+		self.receive_message(self.on_message)
+		MainHandler.receivers.append(self)
+		#print 'opened', self
+		
+	def close(self):
+		MainHandler.receivers.remove(self)
+		
+	def on_message(self, message):
+		self.receive_message(self.on_message)
+
+		args = json.loads(message)
+		action = args['action']
+		cmd = args['cmd']
+		sendid = args['sendid']
+		
+		if action == 'exec':
+			exec(cmd, MainHandler.scope)
+			self.writeback({'sendid':sendid, 'result':'ok'})
+		
+		elif action == 'eval':
+			result = eval(cmd, MainHandler.scope)
+			self.writeback({'sendid':sendid, 'result':result})
+		
+
+
+def setup(scope, port=21000):
+	MainHandler.scope = scope
+	MainHandler.setup()
+	settings = {
+		"static_path": "."
+	}
+	application = tornado.web.Application([
+		(r"/ws/websocket", MainHandler),
+	], **settings)
+	http_server = tornado.httpserver.HTTPServer(application)
+	http_server.listen(port)
+	
+	thread.start_new(tornado.ioloop.IOLoop.instance().start,())
+	
+def push(cmd):
+	MainHandler.longqueue.put(cmd)
+	MainHandler.longout.write('x')	# Pipe interleaving doesn't matter
+	MainHandler.longout.flush()
+	
+def loadimage():
+	from PIL import Image
+	lena = Image.open('lena.jpg')
+	writeimage('#image', lena)
+	
+from Image import Image
+from StringIO import StringIO
+import base64
+def writeimage(selector, img):
+	# Save the image to a temp file
+
+	# Save as jpeg
+	s = StringIO()
+	img.save(s,'jpeg')
+
+	# b64 encode
+	d = base64.b64encode(s.getvalue())
+	push("$('%s').attr('src','data:image/jpeg;base64,%s')" % (selector, d))

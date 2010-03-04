@@ -5,8 +5,10 @@ var keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_="
 var curpath = document.location.pathname;
 var curdir = curpath.substr(0, curpath.lastIndexOf('/')+1);
 
+if (!window.console) console = {log: function(){ }, error: function(){ }};
+
 function output(msg) {
-	alert(msg)
+	window.console.error(msg)
 }
 
 function Python(port) {
@@ -23,9 +25,6 @@ function Python(port) {
 				ws.send(v)
 			})
 			messages = []
-			$(function () {
-				eval('python.eval(\'"ping"\', function (data) { })')
-			})
 	  };
 	  wsnew.onmessage = function(e) {
 			data = JSON.parse(e.data)
@@ -35,7 +34,7 @@ function Python(port) {
 			if (typeof(data.sendid) != 'undefined')	window[data.sendid](data)
 	  };
 	  wsnew.onclose = function() {
-			window.setTimeout(remakews, 1000)
+			window.setTimeout(remakews, 500)
 	  };
 		return wsnew
 	}
@@ -53,7 +52,9 @@ function Python(port) {
   // Set event handlers.
 	function callproc(args, success, error) {
 		if (typeof(error) == 'undefined')
-			error = function (data) { alert('Error making json call') }
+			error = function (error) { output(error) }
+		if (typeof(success) == 'undefined')
+			success = function (){}
 		
 		function callback(data) {
 			if (typeof(data.result) != 'undefined') success(data.result)

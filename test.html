@@ -28,6 +28,8 @@ python = Python(21000)
 <p>Make sure this folder (pyreg) is in your path. Get things started by running:
 <code>python -m ajax_run test.py</code>. This opens up a server, executes 'test.py', and drops you into an IPython shell.
 
+<p>Next point the browser at <a href="http://localhost:21000/static/test.html">http://localhost:21000/static/test.html</a>. In Chrome, WebSockets are natively supported so you can just open the file locally. Other browsers need a flash wrapper, which requires a server.
+
 <script>
 </script>
 <p>Ready: <span>[loading indicator]</span>
@@ -46,7 +48,7 @@ function execpy() {
 }	
 </script>
 
-<p>Try evaluating python expressions and executing python statements. The statements are sent as strings, and the results are jsonified.
+<p>Try evaluating python expressions and executing python statements. The statements are sent as strings, and the results are jsonified. Everything done in 'test.py' and everything in the IPython shell are available.
 	
 <br><input id="exectxt" value="A = {'a':'hello', 1:12}">
 <input type="button" value="Execute" onClick="execpy()">
@@ -59,8 +61,10 @@ Result: <code id="evaloutput"></code>
 Go to your terminal, but keep the browser visible. Run a few of the following:
 
 <div><code>pyreg.eval("alert('python says hi')")</code></div>
-<div><code>pyreg.eval("loadimage()")</code></div>
-
+<div><code>pyreg.writeimage('#image',lena)</code></div>
+<br>
+<div>The latter actually writes the PIL.Image as inline data to the image src.</div>
+<br>
 <div><img width="250" id="image"/></div>
 
 <script>
@@ -78,7 +82,8 @@ $(function() {
 
 <h1>ToDo</h1>
 <pre>
-- SimpleHTTPServer is annoying because it prints every request and I can't figure out how to make it quiet. Switching to Tornado or Twisted may help.
-- Longpolling doesn't work right.
+- Clean up git project, use submodules to refer to web-socket-js, tornado. 
+- docstrings
+- Services: library functions (python and js) that manage state and do helpful things.
 </pre>
 

@@ -10,10 +10,9 @@ from PIL import Image
 lena = Image.open('lena.jpg')
 
 import pyreg
-
-def test():
-	
+def loadimage():
 	pyreg.writeimage('#image', lena)
+
 
 from opencv.highgui import *
 from opencv.adaptors import *	
@@ -23,5 +22,3 @@ def cam():
 		frame = cvQueryFrame(cap)
 		pyreg.writeimage('#image', Ipl2PIL(frame))
 	
-
-#print 'hi'

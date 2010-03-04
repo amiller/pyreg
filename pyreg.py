@@ -3,12 +3,15 @@ import tornado.ioloop
 import tornado.options
 import tornado.web
 import tornado.websocket
+import traceback
 
 import os
 import string
 import thread
 import simplejson as json
 import time
+import logging
+import sys
 from Queue import Queue
 
 
@@ -62,12 +65,20 @@ class MainHandler(tornado.websocket.WebSocketHandler):
 		sendid = args['sendid']
 		
 		if action == 'exec':
-			exec(cmd, MainHandler.scope)
-			self.writeback({'sendid':sendid, 'result':'ok'})
-		
+			try:
+				exec(cmd, MainHandler.scope)
+				self.writeback({'sendid':sendid, 'result':'ok'})
+			except Exception as e:
+				self.writeback({'sendid':sendid, 'error':str(e)})
+				logging.error(traceback.format_exc())
+			
 		elif action == 'eval':
-			result = eval(cmd, MainHandler.scope)
-			self.writeback({'sendid':sendid, 'result':result})
+			try:
+				result = eval(cmd, MainHandler.scope)
+				self.writeback({'sendid':sendid, 'result':result})
+			except Exception as e:
+				self.writeback({'sendid':sendid, 'error':str(e)})
+				logging.error(traceback.format_exc())
 		
 
 
@@ -89,11 +100,6 @@ def push(cmd):
 	MainHandler.longqueue.put(cmd)
 	MainHandler.longout.write('x')	# Pipe interleaving doesn't matter
 	MainHandler.longout.flush()
-	
-def loadimage():
-	from PIL import Image
-	lena = Image.open('lena.jpg')
-	writeimage('#image', lena)
 	
 from Image import Image
 from StringIO import StringIO

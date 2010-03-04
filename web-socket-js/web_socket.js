@@ -279,7 +279,7 @@ if (!window.WebSocket) {
 
   // called from Flash
   function webSocketError(message) {
-    console.error(decodeURIComponent(message));
+    //console.error(decodeURIComponent(message));
   }
 
   if (window.addEventListener) {

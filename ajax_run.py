@@ -7,7 +7,7 @@ if __name__ == "__main__":
 
 	scope = dict()
 
-	# Parse command line options, find 'port'
+	# TODO: Parse command line options, find 'port'
 	port = 21000
 	pyreg.setup(scope, port)
 	#print("Ajax Server started...")

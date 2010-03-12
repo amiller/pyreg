@@ -19,6 +19,24 @@ python = Python(21000)
 
 </head>
 
+<div style="float:right">
+	<div id="error"><pre id="error"></pre></div>
+	<span id="ping" style="background-color:lightgreen"></span>
+	<input type="button" id="ping" value="Ping"/>
+</div>
+
+<script>
+$(function() {
+	$('input#ping').click(function() {
+		$('span#ping').html('')
+		python.eval('"ping"', function (data) {
+			if (data == 'ping') $('span#ping').html('OK')
+		})
+	})
+	$('input#ping').trigger('click')
+})
+</script>
+
 <style type="text/css">
 </style>
 

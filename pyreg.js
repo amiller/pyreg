@@ -13,16 +13,18 @@ function output(msg) {
 
 function Python(port) {
 	if (typeof(port) == 'undefined') port = 21000
-	
+	var wstimeout
 	function remakews() {
 		if (ws.readyState == 2)
 			ws = makews()
-		if (!ws.readyState)
-			window.setTimeout(remakews, 500)
+		if (!ws.readyState) {
+			clearTimeout(wstimeout);
+			wstimeout = setTimeout(remakews, 500);
+		}
 	}
 	
 	function makews() {
-		var wsnew = new WebSocket("ws://localhost:" + port + "/ws/websocket");
+		var wsnew = new WebSocket("ws://0.0.0.0:" + port + "/ws/websocket");
 		wsnew.onopen = function() {
 			$.each(messages, function (k, v) {
 				ws.send(v)
@@ -37,7 +39,8 @@ function Python(port) {
 			if (typeof(data.sendid) != 'undefined')	window[data.sendid](data)
 	  };
 	  wsnew.onclose = function() {
-			window.setTimeout(remakews, 500)
+			clearTimeout(wstimeout);
+			wstimeout = setTimeout(remakews, 500);
 	  };
 		return wsnew
 	}

@@ -6,7 +6,7 @@ def dosomething():
 global A
 A = {'a':1, 'b':2}
 
-from Image import Image
+import Image
 lena = Image.open('lena.jpg')
 
 import pyreg

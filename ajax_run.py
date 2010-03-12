@@ -1,6 +1,8 @@
+from __future__ import with_statement
 import sys
 import pyreg
 import logging
+
 if __name__ == "__main__":	
 
 	scope = dict()
@@ -14,7 +16,7 @@ if __name__ == "__main__":
 	try:
 		for f in sys.argv[1:]:
 			execfile(f, scope)
-	except Exception as e:
+	except Exception, e:
 		print e
 	
 	from IPython.Shell import IPShellEmbed

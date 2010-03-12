@@ -68,7 +68,7 @@ class MainHandler(tornado.websocket.WebSocketHandler):
 			try:
 				exec(cmd, MainHandler.scope)
 				self.writeback({'sendid':sendid, 'result':'ok'})
-			except Exception as e:
+			except Exception, e:
 				self.writeback({'sendid':sendid, 'error':str(e)})
 				logging.error(traceback.format_exc())
 			
@@ -76,7 +76,7 @@ class MainHandler(tornado.websocket.WebSocketHandler):
 			try:
 				result = eval(cmd, MainHandler.scope)
 				self.writeback({'sendid':sendid, 'result':result})
-			except Exception as e:
+			except Exception, e:
 				self.writeback({'sendid':sendid, 'error':str(e)})
 				logging.error(traceback.format_exc())
 		

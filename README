@@ -1,10 +1,13 @@
 Installation
 ------------
 
-Make sure you have all the following libraries:
+Make sure you have all the following libraries (use easy_install):
 - IPython
 - simplejson
 - rpyc
+
+You need to install the following project's unstable dev branch:
+http://github.com/facebook/tornado
 
 
 Make sure your PYTHONPATH includes this pyreg directory.

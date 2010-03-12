@@ -15,7 +15,10 @@ function Python(port) {
 	if (typeof(port) == 'undefined') port = 21000
 	
 	function remakews() {
-		ws = makews()
+		if (ws.readyState == 2)
+			ws = makews()
+		if (!ws.readyState)
+			window.setTimeout(remakews, 500)
 	}
 	
 	function makews() {

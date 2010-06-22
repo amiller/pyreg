@@ -2,6 +2,9 @@ from __future__ import with_statement
 import sys
 import pyreg
 import logging
+import threading
+import pyglet
+import traceback
 
 if __name__ == "__main__":	
 
@@ -13,11 +16,22 @@ if __name__ == "__main__":
 	#print("Ajax Server started...")
 	logging.disable(logging.WARNING)
 	
+	from IPython.Shell import IPShellEmbed
+	def run():
+		IPShellEmbed(sys.argv[1:], user_ns=scope)()
+		# Put this here to help pyglet clean up apps immediately
+		# Pointless if no one is using pyglet, oh well
+		pyglet.app.exit()
+		sys.exit()
+		
+	thread = threading.Thread(target=run)
+	thread.start()
+	
 	try:
 		for f in sys.argv[1:]:
 			execfile(f, scope)
 	except Exception, e:
-		print e
-	
-	from IPython.Shell import IPShellEmbed
-	IPShellEmbed(sys.argv[1:], user_ns=scope)()
+		traceback.print_exc()
+		
+	pyreg.start()
+	thread.join()

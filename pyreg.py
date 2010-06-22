@@ -82,6 +82,9 @@ class MainHandler(tornado.websocket.WebSocketHandler):
 		
 
 
+def start():
+	thread.start_new(tornado.ioloop.IOLoop.instance().start,())
+	
 def setup(scope, port=21000):
 	MainHandler.scope = scope
 	MainHandler.setup()
@@ -93,8 +96,7 @@ def setup(scope, port=21000):
 	], **settings)
 	http_server = tornado.httpserver.HTTPServer(application)
 	http_server.listen(port)
-	
-	thread.start_new(tornado.ioloop.IOLoop.instance().start,())
+
 	
 def push(cmd):
 	MainHandler.longqueue.put(cmd)

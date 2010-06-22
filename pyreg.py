@@ -1,10 +1,8 @@
-import tornado.httpserver
-import tornado.ioloop
-import tornado.options
-import tornado.web
-import tornado.websocket
-import traceback
+from twisted.internet import reactor
+from twisted.web.websocket import WebSocketHandler, WebSocketSite
+from twisted.web.static import File
 
+import traceback
 import os
 import string
 import thread
@@ -12,53 +10,25 @@ import simplejson as json
 import time
 import logging
 import sys
-from Queue import Queue
-
-
-def getpipe():
-	r, w = os.pipe()
-	return os.fdopen(r,'r',0), os.fdopen(w,'w',0)
 	
-class MainHandler(tornado.websocket.WebSocketHandler):
-	longin, longout = getpipe()
-	longqueue = Queue()
+class MainHandler(WebSocketHandler):
 	receivers = []
+		
+	def __init__(self, transport):
+		WebSocketHandler.__init__(self, transport)
+		MainHandler.receivers.append(self)
 	
-	@classmethod
-	def _write_handle(cls):
-		print 'written'
+	def connectionLost(self, reason):
+		MainHandler.receivers.remove(self)
 	
-	@classmethod
-	def _push_handler(cls, fd, events):
-		cls.longin.read(1)
-		cmd = cls.longqueue.get()
-		item = {'push':cmd}
-		# Put it on the cache, notify all the waiters
-		cls.receivers = [x for x in cls.receivers if not x.stream.closed()]
-		for receiver in cls.receivers:
-			receiver.writeback(item)
-
 	@classmethod
 	def setup(cls):
-		loop = tornado.ioloop.IOLoop.instance()
-		loop.add_handler(cls.longin.fileno(), cls._push_handler, loop.READ)
-		loop._set_nonblocking(cls.longin.fileno())
+		pass
 	
 	def writeback(self, jsonobj):
-		if not self.stream.closed():
-			self.write_message(json.dumps(jsonobj))
-
-	def open(self):
-		self.receive_message(self.on_message)
-		MainHandler.receivers.append(self)
-		#print 'opened', self
+		self.transport.write(json.dumps(jsonobj))
 		
-	def close(self):
-		MainHandler.receivers.remove(self)
-		
-	def on_message(self, message):
-		self.receive_message(self.on_message)
-
+	def frameReceived(self, message):
 		args = json.loads(message)
 		action = args['action']
 		cmd = args['cmd']
@@ -81,28 +51,26 @@ class MainHandler(tornado.websocket.WebSocketHandler):
 				logging.error(traceback.format_exc())
 		
 
-
+	@classmethod
+	def _push(cls, cmd):
+		item = {'push':cmd}
+		for receiver in cls.receivers:
+			receiver.writeback(item)
 def start():
-	thread.start_new(tornado.ioloop.IOLoop.instance().start,())
-	
+	thread.start_new_thread(reactor.run, (), {'installSignalHandlers':0})
+
 def setup(scope, port=21000):
 	MainHandler.scope = scope
 	MainHandler.setup()
-	settings = {
-		"static_path": "."
-	}
-	application = tornado.web.Application([
-		(r"/ws/websocket", MainHandler),
-	], **settings)
-	http_server = tornado.httpserver.HTTPServer(application)
-	http_server.listen(port)
+	root = File(".")
+	root.putChild('_pyreg',File(os.path.dirname(__file__)))
+	site = WebSocketSite(root)
+	site.addHandler("/ws/websocket", MainHandler)
+	reactor.listenTCP(port, site)
+	
 
-	
 def push(cmd):
-	MainHandler.longqueue.put(cmd)
-	MainHandler.longout.write('x')	# Pipe interleaving doesn't matter
-	MainHandler.longout.flush()
-	
+	reactor.callFromThread(MainHandler._push, cmd)
 	
 from Image import Image
 from StringIO import StringIO

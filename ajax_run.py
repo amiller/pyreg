@@ -3,7 +3,7 @@ import sys
 import pyreg
 import logging
 import threading
-import pyglet
+#import pyglet
 import traceback
 
 if __name__ == "__main__":	
@@ -21,7 +21,7 @@ if __name__ == "__main__":
 		IPShellEmbed(sys.argv[1:], user_ns=scope)()
 		# Put this here to help pyglet clean up apps immediately
 		# Pointless if no one is using pyglet, oh well
-		pyglet.app.exit()
+		#pyglet.app.exit()
 		sys.exit()
 		
 	thread = threading.Thread(target=run)

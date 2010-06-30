@@ -17,14 +17,14 @@ if __name__ == "__main__":
 	logging.disable(logging.WARNING)
 	
 	from IPython.Shell import IPShellEmbed
-	def run():
+	def ajax_run():
 		IPShellEmbed(sys.argv[1:], user_ns=scope)()
 		# Put this here to help pyglet clean up apps immediately
 		# Pointless if no one is using pyglet, oh well
 		#pyglet.app.exit()
 		sys.exit()
 		
-	thread = threading.Thread(target=run)
+	thread = threading.Thread(target=ajax_run)
 	thread.start()
 	
 	try:

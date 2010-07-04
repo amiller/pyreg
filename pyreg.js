@@ -24,7 +24,7 @@ function Python(port) {
 	}
 	
 	function makews() {
-		var wsnew = new WebSocket("ws://0.0.0.0:" + port + "/ws/websocket");
+		var wsnew = new WebSocket("ws://127.0.0.1:" + port + "/ws/websocket");
 		wsnew.onopen = function() {
 			$.each(messages, function (k, v) {
 				ws.send(v)

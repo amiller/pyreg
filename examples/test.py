@@ -9,9 +9,9 @@ A = {'a':1, 'b':2}
 import Image
 lena = Image.open('lena.jpg')
 
-import pyreg
+import browser
 def loadimage():
-	pyreg.writeimage('#image', lena)
+	browser.writeimage('#image', lena)
 
 # 
 # from opencv.highgui import *

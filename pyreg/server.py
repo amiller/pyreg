@@ -1,6 +1,6 @@
 from __future__ import with_statement
 import sys
-import pyreg
+import browser
 import logging
 import threading
 #import pyglet
@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
 	# TODO: Parse command line options, find 'port'
 	port = 21000
-	pyreg.setup(scope, port)
+	browser.setup(scope, port)
 	#print("Ajax Server started...")
 	logging.disable(logging.WARNING)
 	
@@ -33,5 +33,5 @@ if __name__ == "__main__":
 	except Exception, e:
 		traceback.print_exc()
 		
-	pyreg.start()
+	browser.start()
 	thread.join()

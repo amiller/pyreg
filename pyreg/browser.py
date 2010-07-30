@@ -1,5 +1,5 @@
 from twisted.internet import reactor
-from twisted.web.websocket import WebSocketHandler, WebSocketSite
+from websocket import WebSocketHandler, WebSocketSite
 from twisted.web.static import File
 
 import traceback

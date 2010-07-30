@@ -4,6 +4,7 @@ Installation
 Make sure you have all the following libraries (use easy_install):
 - IPython
 - simplejson
+- 
 
 Make sure your PYTHONPATH includes this pyreg directory.
 
@@ -19,5 +20,12 @@ Usage
 
 2. Open test.html in a browser. Documentation takes over from there.
 
+
+Notes
+____
+The websocket module comes from here:
+http://github.com/rlotun/txWebSocket/tree/7946be32b2971ba59b856f8d6d128d848e31551a
+
+I couldn't figure out an easier way to reference it.
 
 

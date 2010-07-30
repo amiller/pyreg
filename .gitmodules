@@ -1,0 +1,3 @@
+[submodule "pyreg/txWebSocket"]
+	path = pyreg/txWebSocket
+	url = http://github.com/rlotun/txWebSocket.git

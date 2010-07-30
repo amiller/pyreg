@@ -1,1 +1,0 @@
-perl -T socketpolicy.pl

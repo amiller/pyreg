@@ -12,13 +12,12 @@ Make sure your PYTHONPATH includes this pyreg directory.
 Usage
 -----
 
-0. If you're using Chrome Beta, websockets are supported. Otherwise, you need to use flash and run the socket server. You need superuser to open port 843 on Mac.
-	$ perl -T socketpolicy/socketpolicy.pl
+0. You need to have a browser supporting websockets, such as Chrome 5.
 
-1. Run the server and the test script
-	$ python -m ajax_run test.py
+1. Go to the examples directory. Run the server and the test script
+	$ python -m pyreg.server test.py
 
-2. Open test.html in a browser. Documentation takes over from there.
+2. Open http://localhost:21000/test.html in a browser. Documentation takes over from there.
 
 
 Notes

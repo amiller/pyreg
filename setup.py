@@ -8,8 +8,8 @@ setup(
 		'pyreg': ['_pyreg/*']
 	},
 	
-	package_requires = ['IPython','simplejson','PIL','bunch','twisted'],
-	install_requires = ['setuptools']
+	requires = ['IPython','simplejson','PIL','bunch','twisted'],
+	install_requires = ['setuptools'],
 	
 	author="Andrew Miller",
 	author_email="amiller@dappervision.com",

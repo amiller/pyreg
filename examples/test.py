@@ -9,7 +9,7 @@ A = {'a':1, 'b':2}
 import Image
 lena = Image.open('lena.jpg')
 
-import browser
+from pyreg import browser
 def loadimage():
 	browser.writeimage('#image', lena)
 

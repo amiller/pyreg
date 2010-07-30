@@ -1,6 +1,6 @@
 from __future__ import with_statement
 import sys
-import browser
+from pyreg import browser
 import logging
 import threading
 #import pyglet

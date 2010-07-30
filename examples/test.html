@@ -40,14 +40,10 @@ $(function() {
 <h1>PyReg Demo</h1>
 <p>This project makes a simple bridge between your python and your javascript. You can use the browser as an interface and debug display for your code!
 	
-<p>Make sure this folder (pyreg) is in your path. Get things started by running:
-<code>python -m ajax_run test.py</code>. This opens up a server, executes 'test.py', and drops you into an IPython shell.
+<p>Make sure to be in the examples directory, then get things started by running:
+<code>python -m pyreg.server test.py</code>. This opens up a server, executes 'test.py', and drops you into an IPython shell. 
 
-<p>Next point the browser at <a href="http://localhost:21000/static/test.html">http://localhost:21000/static/test.html</a>. In Chrome, WebSockets are natively supported so you can just open the file locally. Other browsers need a flash wrapper, which requires a server.
-
-<script>
-</script>
-<p>Ready: <span>[loading indicator]</span>
+<p>Next point the browser at <a href="http://localhost:21000/test.html">http://localhost:21000/test.html</a>. You'll know it's working when a green 'OK' light appears in the top right corner by the 'ping' button.
 
 <h2>1. Javascript to Python</h2>
 
@@ -75,8 +71,8 @@ Result: <code id="evaloutput"></code>
 <h2>2. Python to Javascript</h2>
 Go to your terminal, but keep the browser visible. Run a few of the following:
 
-<div><code>pyreg.eval("alert('python says hi')")</code></div>
-<div><code>pyreg.writeimage('#image',lena)</code></div>
+<div><code>browser.eval("alert('python says hi')")</code></div>
+<div><code>browser.writeimage('#image',lena)</code></div>
 <br>
 <div>The latter actually writes the PIL.Image as inline data to the image src.</div>
 <br>
@@ -95,10 +91,5 @@ $(function() {
 })
 </script>
 
-<h1>ToDo</h1>
-<pre>
-- Clean up git project, use submodules to refer to web-socket-js, tornado. 
-- docstrings
-- Services: library functions (python and js) that manage state and do helpful things.
-</pre>
+
 

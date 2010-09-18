@@ -3,8 +3,21 @@ import sys
 from pyreg import browser
 import logging
 import threading
-#import pyglet
+try: import pyglet except: pass
 import traceback
+
+import IPython
+from IPython.Shell import IPShellEmbed
+def start():
+	
+	ipshell = IPShellEmbed(sys.argv[1:], user_ns=scope)
+	#ipshell.IP.runlines('from pylab import ion; ion()')
+	ipshell()
+	
+	# Put this here to help pyglet clean up apps immediately
+	# Pointless if no one is using pyglet, oh well
+	try: pyglet.app.exit() except: pass
+	sys.exit()
 
 if __name__ == "__main__":	
 
@@ -16,15 +29,7 @@ if __name__ == "__main__":
 	#print("Ajax Server started...")
 	logging.disable(logging.WARNING)
 	
-	from IPython.Shell import IPShellEmbed
-	def ajax_run():
-		IPShellEmbed(sys.argv[1:], user_ns=scope)()
-		# Put this here to help pyglet clean up apps immediately
-		# Pointless if no one is using pyglet, oh well
-		#pyglet.app.exit()
-		sys.exit()
-		
-	thread = threading.Thread(target=ajax_run)
+	thread = threading.Thread(target=start)
 	thread.start()
 	
 	try:

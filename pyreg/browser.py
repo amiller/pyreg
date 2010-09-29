@@ -56,6 +56,7 @@ class MainHandler(WebSocketHandler):
 		item = {'push':cmd}
 		for receiver in cls.receivers:
 			receiver.writeback(item)
+			
 def start():
 	thread.start_new_thread(reactor.run, (), {'installSignalHandlers':0})
 
@@ -63,7 +64,7 @@ def setup(scope, port=21000):
 	MainHandler.scope = scope
 	MainHandler.setup()
 	root = File(".")
-	root.putChild('_pyreg',File(os.path.dirname(__file__)+'/_pyreg'))
+	#root.putChild('_pyreg',File(os.path.dirname(__file__)+'/_pyreg'))
 	site = WebSocketSite(root)
 	site.addHandler("/ws/websocket", MainHandler)
 	reactor.listenTCP(port, site)
@@ -71,7 +72,7 @@ def setup(scope, port=21000):
 
 def push(cmd):
 	reactor.callFromThread(MainHandler._push, cmd)
-	
+
 from Image import Image
 from StringIO import StringIO
 import base64

@@ -3,7 +3,6 @@ import sys
 from pyreg import browser
 import logging
 import threading
-try: import pyglet except: pass
 import traceback
 
 import IPython
@@ -16,11 +15,14 @@ def start():
 	
 	# Put this here to help pyglet clean up apps immediately
 	# Pointless if no one is using pyglet, oh well
-	try: pyglet.app.exit() except: pass
+	try: 
+		import pyglet
+		pyglet.app.exit() 
+	except: pass
 	sys.exit()
-
-if __name__ == "__main__":	
-
+	
+def main():
+	global scope
 	scope = dict()
 
 	# TODO: Parse command line options, find 'port'
@@ -40,3 +42,7 @@ if __name__ == "__main__":
 		
 	browser.start()
 	thread.join()
+	
+if __name__ == "__main__":	
+	main()
+

@@ -64,7 +64,7 @@ def setup(scope, port=21000):
 	MainHandler.scope = scope
 	MainHandler.setup()
 	root = File(".")
-	#root.putChild('_pyreg',File(os.path.dirname(__file__)+'/_pyreg'))
+	root.putChild('_pyreg',File(os.path.dirname(__file__)+'/_pyreg'))
 	site = WebSocketSite(root)
 	site.addHandler("/ws/websocket", MainHandler)
 	reactor.listenTCP(port, site)

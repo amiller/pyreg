@@ -10,8 +10,8 @@ from IPython.Shell import IPShellEmbed
 scope = {}
 
 
-def start(ipy_options={}):
-    ipshell = IPShellEmbed(sys.argv[1:], user_ns=scope, **ipy_options)
+def start(args):
+    ipshell = IPShellEmbed(args, user_ns=scope)
     #ipshell.IP.runlines('from pylab import ion; ion()')
     ipshell()
 
@@ -25,7 +25,7 @@ def start(ipy_options={}):
     sys.exit()
 
 
-def main(**kwargs):
+def main(args):
     global scope
 
     # TODO: Parse command line options, find 'port'
@@ -34,7 +34,7 @@ def main(**kwargs):
     #print("Ajax Server started...")
     logging.disable(logging.WARNING)
 
-    thread = threading.Thread(target=start,kwargs=kwargs)
+    thread = threading.Thread(target=start,args=[args])
     thread.start()
 
     try:
@@ -48,4 +48,4 @@ def main(**kwargs):
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])
